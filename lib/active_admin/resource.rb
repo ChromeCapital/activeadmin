@@ -142,7 +142,11 @@ module ActiveAdmin
     end
 
     def find_resource(id)
-      resource = resource_class.where(resource_class.primary_key => id).first
+      resource = if scope_to?(self)
+        call_method_or_exec_proc(scope_to_method).where(resource_class.primary_key => id).first
+      else
+        resource_class.where(resource_class.primary_key => id).first
+      end
       decorator_class ? decorator_class.new(resource) : resource
     end
 
